@@ -1,4 +1,4 @@
-import { flatMap } from "cypress/types/lodash";
+import { useRef } from "react";
 import { useState, useEffect } from "react";
 import debounce from 'lodash.debounce';
 import React, { useCallback } from 'react';
@@ -12,7 +12,7 @@ interface PersonType {
 
 interface AutocompleteProps {
   delay?: number;
-  onSelected: (person: PersonType) => void;
+  onSelected: (person: PersonType | null) => void;
   people: PersonType[];
   placeholder?: string;
 }
@@ -23,7 +23,8 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({ people, onSelected, 
   const [suggestions, setSuggestions] = useState<PersonType[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedSuggestions, setSelectedSuggestions] = useState<PersonType | null>(null);
-
+  
+  const lastFilteredValue = useRef<string>('');
   const applyFiltering = useCallback(
     debounce((query: string) => {
       if (query.trim() === '') {
@@ -31,6 +32,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({ people, onSelected, 
       } else {
         const filtered = people.filter(person =>
           person.name.toLowerCase().includes(query.trim().toLowerCase())
+
         );
         setSuggestions(filtered);
       }
@@ -39,12 +41,19 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({ people, onSelected, 
   );
 
   useEffect(() => {
-    if (selectedSuggestions && value !== setSelectedSuggestions.name) {
+    if (selectedSuggestions && value !== selectedSuggestions.name) {
       onSelected(null);
       setSelectedSuggestions(null);
     }
 
+    if (lastFilteredValue.current !== value) {
     applyFiltering(value);
+    lastFilteredValue.current = value;
+    }
+    
+    if (value !== "" && value.trim() === "") {
+      return;
+    }
 
     return () => {
       applyFiltering.cancel();

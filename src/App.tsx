@@ -12,13 +12,6 @@ interface PersonType {
   died: number;
 }
 
-interface AutocompleteProps {
-  delay?: number;
-  onSelected: (person: PersonType) => void;
-  people: PersonType[];
-  placeholder?: string;
-}
-
 export const App: React.FC = () => {
   const [selectedPerson, setSelectedPerson] = useState<PersonType | null>(null);
   
