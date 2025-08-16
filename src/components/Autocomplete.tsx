@@ -46,13 +46,13 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({ people, onSelected, 
       setSelectedSuggestions(null);
     }
 
+    if (value !== "" && value.trim() === "") {
+      return;
+    }
+
     if (lastFilteredValue.current !== value) {
     applyFiltering(value);
     lastFilteredValue.current = value;
-    }
-    
-    if (value !== "" && value.trim() === "") {
-      return;
     }
 
     return () => {
@@ -88,7 +88,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({ people, onSelected, 
   const showNoSuggestions = suggestions.length === 0 && value.trim() !== '';
 
   return (
-    <div className="dropdown">
+    <div className={`dropdown ${isDropdownOpen ? "is-active" : ""}`}>
       <input
         type="text"
         className="input"
